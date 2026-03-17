@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تجربة أزرار الواتساب - نظام الصالون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            min-height: 100vh;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(197,160,89,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(37,211,102,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeDown 0.8s ease forwards;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #c5a059;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(197,160,89,0.4);
+        }
+
+        .header p {
+            color: #555;
+            font-size: 14px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.6s ease forwards;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(197,160,89,0.25);
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        .card-label {
+            font-size: 12px;
+            color: #666;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-label span {
+            background: rgba(197,160,89,0.15);
+            color: #c5a059;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 15px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background 0.2s;
+        }
+
+        .btn:hover::after { background: rgba(255,255,255,0.08); }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-simple {
+            background: linear-gradient(135deg, #25D366, #1da851);
+            color: white;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.25);
+        }
+
+        .btn-encoded {
+            background: linear-gradient(135deg, #128C7E, #0d6b5e);
+            color: white;
+            box-shadow: 0 4px 20px rgba(18,140,126,0.25);
+        }
+
+        .btn-js {
+            background: linear-gradient(135deg, #34b7f1, #1a9fd4);
+            color: white;
+            box-shadow: 0 4px 20px rgba(52,183,241,0.25);
+        }
+
+        .btn-vip {
+            background: #000;
+            border: 1.5px solid #c5a059;
+            color: #c5a059;
+            box-shadow: 0 4px 25px rgba(197,160,89,0.2);
+        }
+
+        .btn-vip:hover { box-shadow: 0 6px 35px rgba(197,160,89,0.4); }
+
+        .icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .divider {
+            width: 1px;
+            height: 18px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>📲 أزرار الواتساب</h2>
+        <p>نظام صالون — تجربة الإشعارات</p>
+    </div>
+
+    <div class="cards-wrapper">
+
+        <div class="card">
+            <div class="card-label">
+                الزر الأول <span>SIMPLE</span>
+            </div>
+            <button class="btn btn-simple" onclick="sendSimple()">
+                <span class="icon">💬</span>
+                إرسال نص واضح
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-label">
+                الزر الثاني <span>ENCODED</span>
+            </div>
+            <button class="btn btn-encoded" onclick="sendEncoded()">
+                <span class="icon">🔐</span>
+                إرسال نص مشفر (آمن)
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-label">
+                الزر الثالث <span>JS</span>
+            </div>
+            <button class="btn btn-js" onclick="sendWhatsApp()">
+                <span class="icon">⚡</span>
+                إرسال عبر JavaScript
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-label">
+                الزر الرابع <span>VIP</span>
+            </div>
+            <button class="btn btn-vip" onclick="sendWhatsApp()">
+                <span class="icon">✨</span>
+                تذكير زبونة VIP
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const phone = "966556308737";
+
+        function sendSimple() {
+            const message = "أهلا نورة، نذكرك بموعدك اليوم";
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function sendEncoded() {
+            const message = "أهلاً نورة 🌸، نذكرك بموعدك ✨";
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function sendWhatsApp() {
+            const name    = "نورة";
+            const service = "ميك أب";
+            const time    = "5:00 مساءً";
+            const message = `أهلاً ${name} 🌸، نذكرك بموعدك لـ (${service}) اليوم الساعة ${time} في صالوننا. بانتظار إطلالتك ✨`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
+
+</body>
+</html>
