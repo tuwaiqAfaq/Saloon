@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام الصالون - توجيه ذكي</title>
+    <style>
+        :root {
+            --primary-gold: #c5a059;
+            --soft-bg: #f4f7f6;
+            --dark-text: #333;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 30px; padding-top: 50px; background-color: var(--soft-bg); color: var(--dark-text); }
+        
+        /* حاوية القائمة المنسدلة */
+        .dropdown-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ستايل القائمة المنسدلة */
+        select {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            width: 320px;
+            cursor: pointer;
+            outline: none;
+            background-color: white;
+            transition: all 0.3s ease;
+            appearance: none; /* إخفاء سهم المتصفح الافتراضي */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c5a059' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+        }
+
+        /* تأثير النبض الذهبي - هذا هو كاسر الجليد الوظيفي */
+        .pulse-effect {
+            animation: shadow-pulse 2s infinite;
+            border-color: var(--primary-gold);
+        }
+
+        @keyframes shadow-pulse {
+            0% { box-shadow: 0 0 0 0px rgba(197, 160, 89, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(197, 160, 89, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(197, 160, 89, 0); }
+        }
+
+        /* تلميح صغير فوق القائمة */
+        .hint-text {
+            font-size: 13px;
+            color: var(--primary-gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.9;
+        }
+
+        /* زر الواتساب الـ VIP */
+        .btn-styled { 
+            padding: 15px 25px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            border: 2px solid var(--primary-gold); 
+            border-radius: 8px; 
+            background-color: #000; 
+            color: var(--primary-gold); 
+            font-weight: bold; 
+            width: 320px; 
+            transition: 0.3s; 
+            margin-top: 20px;
+        }
+
+        .btn-styled:hover { background-color: var(--primary-gold); color: black; }
+        
+    </style>
+</head>
+<body>
+
+    <h2 style="margin-bottom: 0;">نظام إدارة صالونك الأنيق ✨</h2>
+    <p style="color: #666; margin-top: 0;">المواعيد جاهزة.. ابدئي بالخطوة الأولى</p>
+
+    <div class="dropdown-container">
+        <div class="hint-text" id="hint">
+            <span>👇 ابدئي من هنا لاختيار الخدمة</span>
+        </div>
+        
+        <select id="serviceSelect" class="pulse-effect" onchange="stopPulse()">
+            <option value="" disabled selected>اختاري نوع الخدمة...</option>
+            <option value="makeup">ميك أب كامل - نورة</option>
+            <option value="hair">استشوار وويفي - سارة</option>
+            <option value="nails">بديكير ومنيكير - ريما</option>
+        </select>
+    </div>
+
+    <button class="btn-styled" onclick="sendWhatsApp()">
+        تذكير الزبونة بالواتساب 📲
+    </button>
+
+    <script>
+        function stopPulse() {
+            // بمجرد ما تختار، نوقف النبض ونخفي التلميح عشان ما يزعجها
+            const dropdown = document.getElementById('serviceSelect');
+            const hint = document.getElementById('hint');
+            
+            dropdown.classList.remove('pulse-effect');
+            hint.style.display = 'none';
+        }
+
+        function sendWhatsApp() {
+            const select = document.getElementById('serviceSelect');
+            if (select.value === "") {
+                alert("لطفاً، اختاري الخدمة من القائمة أولاً ✨");
+                return;
+            }
+            
+            const phone = "966556308737";
+            const service = select.options[select.selectedIndex].text;
+            const message = `أهلاً نورة 🌸، تم تأكيد موعدك لـ (${service}). بانتظار إطلالتك ✨`;
+            
+            window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
+
+</body>
+</html>
