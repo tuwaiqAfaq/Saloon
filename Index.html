@@ -1,226 +1,234 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SalonBooking Pro V15 - Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>SalonBooking Pro | Demo Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* احتفظت بنفس الـ CSS الفاخر الذي أرسلته مع إضافة ألوان الحالات الجديدة */
         :root {
-            --primary: #d4af37;
-            --dark: #1a1a1a;
-            --bg: #f8f9fa;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
+            --brand-gradient: linear-gradient(135deg, #c89fa3 0%, #ab7a80 100%);
+            --brand-glow: 0 10px 25px -5px rgba(171, 122, 128, 0.4);
+            --bg-main: #fbf9f9; 
+            --surface: rgba(255, 255, 255, 0.95);
+            --border-light: rgba(224, 212, 214, 0.8);
+            --text-main: #373233; 
+            --text-muted: #8b8082;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --shadow-float: 0 20px 40px -15px rgba(55, 50, 51, 0.05);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px;
+            font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+            background-color: var(--bg-main);
+            background-image: radial-gradient(#ebe1e3 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
         }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+        /* Navbar & Layout - نفس تصميمك */
+        .navbar { margin: 24px auto; width: calc(100% - 48px); max-width: 1400px; height: 64px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 24px; gap: 30px; box-shadow: var(--shadow-card); position: relative; z-index: 100; }
+        .nav-logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 800; }
+        .nav-logo-icon { width: 36px; height: 36px; background: var(--brand-gradient); border-radius: 10px; display: grid; place-items: center; color: #fff; box-shadow: var(--brand-glow); }
+        
+        .page-layout { display: grid; grid-template-columns: 380px 1fr; gap: 32px; max-width: 1400px; margin: 0 auto; width: 100%; padding: 10px 24px 60px; }
+        @media (max-width: 900px) { .page-layout { grid-template-columns: 1fr; } }
 
-        h2 { text-align: center; color: var(--dark); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+        .card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-float); padding: 32px; }
+        .card-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+        .card-title::before { content: ''; display: block; width: 6px; height: 20px; background: var(--brand-gradient); border-radius: 6px; }
 
-        /* شبكة التواريخ */
-        .date-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+        /* Inputs & Buttons */
+        .field-group { margin-bottom: 20px; }
+        .field-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+        .field-select { width: 100%; padding: 12px; border: 2px solid #ebe1e3; border-radius: var(--radius-md); font-family: inherit; font-weight: 600; outline: none; }
 
-        .date-item {
-            padding: 10px;
-            text-align: center;
-            background: #eee;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        /* Time Grid & Slots */
+        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .t-slot { padding: 10px 0; border-radius: var(--radius-sm); border: 1.5px solid var(--border-light); text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .t-slot.selected { background: var(--brand-gradient); color: #fff; border-color: transparent; }
+        .t-slot.booked { opacity: 0.4; cursor: not-allowed; background: #eee; }
 
-        .date-item.active { background: var(--primary); color: white; }
+        /* Agenda Cards */
+        .a-card { display: flex; align-items: center; padding: 20px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); margin-bottom: 12px; }
+        .a-time { width: 120px; border-left: 2px solid #f9f8f8; }
+        .a-details { flex: 1; padding: 0 15px; }
+        
+        /* ألوان الحالات الجديدة */
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+        .status-scheduled { background: #e0f2fe; color: #0369a1; } /* مجدول */
+        .status-ongoing { background: #dcfce7; color: #15803d; border: 1px solid #15803d; animation: pulse 2s infinite; } /* جارٍ الآن */
+        .status-finished { background: #f3f4f6; color: #6b7280; opacity: 0.7; } /* منتهي */
 
-        /* الأجندة والمواعيد */
-        .agenda { margin-top: 30px; }
-        .appointment-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-right: 5px solid var(--primary);
-            background: #fff;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        .status { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        .status-scheduled { background: #e3f2fd; color: #0d47a1; } /* مجدول */
-        .status-ongoing { background: #e8f5e9; color: #1b5e20; border: 1px solid #1b5e20; } /* جارٍ */
-        .status-finished { background: #fafafa; color: #757575; text-decoration: line-through; } /* منتهي */
+        .btn-submit { width: 100%; padding: 16px; margin-top: 20px; background: var(--brand-gradient); color: white; border: none; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; box-shadow: var(--brand-glow); }
+        .btn-del { color: #ef4444; background: none; border: 1px solid #fee2e2; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        /* فورم الحجز */
-        .booking-form {
-            background: #f1f1f1;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        button { background: var(--dark); color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: var(--primary); }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-
-        .time-lock { color: var(--danger); text-align: center; font-weight: bold; display: none; }
+        .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+        .date-chip { min-width: 60px; padding: 10px; border: 1px solid var(--border-light); border-radius: 12px; text-align: center; cursor: pointer; background: white; }
+        .date-chip.active { background: var(--brand-gradient); color: white; border: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>صالون ومدة - SalonBooking Pro V15</h2>
-    
-    <div id="lockMessage" class="time-lock">عذراً، انتهى وقت العمل اليوم (8:00 مساءً). يرجى الحجز ليوم آخر.</div>
+<nav class="navbar">
+    <div class="nav-logo"><div class="nav-logo-icon">✨</div> SalonBooking Pro</div>
+    <div style="flex:1"></div>
+    <div id="user-name" style="font-weight: 700; font-size: 14px;">مديرة النظام</div>
+</nav>
 
-    <div class="booking-form" id="bookingForm">
-        <label>اختر الخبيرة:</label>
-        <select id="expertSelect">
-            <option value="سارة">سارة (شعر)</option>
-            <option value="نورة">نورة (ميك اب)</option>
-            <option value="ريم">ريم (أظافر)</option>
-        </select>
-        
-        <label>الوقت:</label>
-        <input type="time" id="appointmentTime" required>
-        
-        <button onclick="saveAppointment()" id="btnSave">حجز موعد جديد</button>
-    </div>
+<div class="page-layout">
+    <aside>
+        <div class="card">
+            <div class="card-title">حجز موعد جديد</div>
+            <div class="field-group">
+                <label class="field-label">الخدمة</label>
+                <select class="field-select" id="work" onchange="updateUI()"></select>
+            </div>
+            <div class="field-group">
+                <label class="field-label">الخبيرة</label>
+                <select class="field-select" id="eng" onchange="onEngChange()"></select>
+            </div>
+            <div class="field-label">اختر التاريخ</div>
+            <div class="date-strip" id="slider"></div>
+            <div class="field-label" style="margin-top:20px">الوقت المتاح</div>
+            <div class="time-grid" id="grid"></div>
+            <button class="btn-submit" onclick="saveBooking()">تأكيد الحجز 💅</button>
+        </div>
+    </aside>
 
-    <div class="date-grid" id="dateGrid"></div>
-
-    <div class="agenda">
-        <h3>جدول المواعيد ليوم <span id="selectedDateText"></span></h3>
-        <div id="appointmentsList"></div>
-    </div>
+    <main>
+        <div class="card">
+            <div class="card-title" id="agenda-title">مواعيد اليوم</div>
+            <div id="agenda-list"></div>
+        </div>
+    </main>
 </div>
 
 <script>
-    let selectedDate = new Date().toISOString().split('T')[0];
-    const workingHoursEnd = 20; // 8:00 PM
+// الإعدادات الافتراضية للنسخة التجريبية
+let SYSTEM = {
+    engineers: ["سارة (شعر)", "نورة (ميك اب)", "ريم (أظافر)"],
+    equipment: ["قص واستشوار", "مكياج سهرة", "مانيكير وباديكير", "تنظيف بشرة"],
+    startHour: 10,
+    endHour: 22,
+    bookings: JSON.parse(localStorage.getItem('salon_db') || '[]')
+};
 
-    // تشغيل النظام
-    window.onload = () => {
-        renderDates();
-        loadAppointments();
-        checkTimeLock();
-    };
+let selDate = new Date().toISOString().split('T')[0];
+let selStart = null;
+const dur = 1; 
 
-    function checkTimeLock() {
-        const now = new Date();
-        const isToday = selectedDate === now.toISOString().split('T')[0];
-        if (isToday && now.getHours() >= workingHoursEnd) {
-            document.getElementById('lockMessage').style.display = 'block';
-            document.getElementById('btnSave').disabled = true;
-        } else {
-            document.getElementById('lockMessage').style.display = 'none';
-            document.getElementById('btnSave').disabled = false;
-        }
+window.onload = () => {
+    // تعبئة القوائم
+    document.getElementById('work').innerHTML = SYSTEM.equipment.map(e => `<option>${e}</option>`).join('');
+    document.getElementById('eng').innerHTML = SYSTEM.engineers.map(e => `<option>${e}</option>`).join('');
+    buildCalendar();
+    updateUI();
+};
+
+function buildCalendar() {
+    const slider = document.getElementById('slider');
+    slider.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(); d.setDate(d.getDate() + i);
+        const dStr = d.toISOString().split('T')[0];
+        const chip = document.createElement('div');
+        chip.className = `date-chip ${dStr === selDate ? 'active' : ''}`;
+        chip.innerHTML = `<strong>${d.getDate()}</strong><br><small>${d.toLocaleDateString('ar-SA', {weekday: 'short'})}</small>`;
+        chip.onclick = () => { selDate = dStr; buildCalendar(); updateUI(); };
+        slider.appendChild(chip);
     }
+}
 
-    function renderDates() {
-        const grid = document.getElementById('dateGrid');
-        grid.innerHTML = '';
-        for (let i = 0; i < 7; i++) {
-            const d = new Date();
-            d.setDate(d.getDate() + i);
-            const dateStr = d.toISOString().split('T')[0];
-            
-            const div = document.createElement('div');
-            div.className = `date-item ${dateStr === selectedDate ? 'active' : ''}`;
-            div.innerHTML = `<strong>${d.getDate()}</strong><br>${d.toLocaleDateString('ar-SA', {weekday: 'short'})}`;
-            div.onclick = () => {
-                selectedDate = dateStr;
-                renderDates();
-                loadAppointments();
-                checkTimeLock();
-            };
-            grid.appendChild(div);
-        }
-        document.getElementById('selectedDateText').innerText = selectedDate;
+function updateUI() {
+    renderTime();
+    renderAgenda();
+}
+
+function renderTime() {
+    const grid = document.getElementById('grid');
+    const eng = document.getElementById('eng').value;
+    grid.innerHTML = '';
+    for (let h = SYSTEM.startHour; h < SYSTEM.endHour; h++) {
+        const isBooked = SYSTEM.bookings.some(b => b.date === selDate && b.n === eng && b.s === h);
+        const slot = document.createElement('div');
+        slot.className = `t-slot ${isBooked ? 'booked' : ''} ${selStart === h ? 'selected' : ''}`;
+        slot.textContent = fmt(h);
+        if (!isBooked) slot.onclick = () => { selStart = h; renderTime(); };
+        grid.appendChild(slot);
     }
+}
 
-    function saveAppointment() {
-        const expert = document.getElementById('expertSelect').value;
-        const time = document.getElementById('appointmentTime').value;
+function getStatus(startH, dateStr) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const today = now.toISOString().split('T')[0];
 
-        if (!time) return alert("يرجى اختيار الوقت");
+    if (dateStr < today) return { label: "منتهي", class: "status-finished" };
+    if (dateStr > today) return { label: "مجدول", class: "status-scheduled" };
+    
+    // إذا كان اليوم
+    if (currentHour > startH) return { label: "منتهي", class: "status-finished" };
+    if (currentHour === startH) return { label: "جارٍ الآن", class: "status-ongoing" };
+    return { label: "مجدول", class: "status-scheduled" };
+}
 
-        const appointments = JSON.parse(localStorage.getItem('salon_appointments') || '[]');
-        appointments.push({ date: selectedDate, expert, time, id: Date.now() });
-        localStorage.setItem('salon_appointments', JSON.stringify(appointments));
-        
-        loadAppointments();
-    }
+function renderAgenda() {
+    const list = document.getElementById('agenda-list');
+    const filtered = SYSTEM.bookings.filter(b => b.date === selDate).sort((a,b) => a.s - b.s);
+    list.innerHTML = filtered.length ? '' : '<p style="text-align:center; color:#999; padding:20px;">لا توجد مواعيد</p>';
 
-    function getStatus(appTime, appDate) {
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
-        
-        // تحويل وقت الموعد لتاريخ كامل للمقارنة
-        const [hours, minutes] = appTime.split(':');
-        const appointmentFullDate = new Date(appDate);
-        appointmentFullDate.setHours(hours, minutes, 0);
-
-        const diffInMinutes = (now - appointmentFullDate) / (1000 * 60);
-
-        if (appDate < todayStr) return { label: 'منتهي', class: 'status-finished' };
-        if (appDate > todayStr) return { label: 'مجدول', class: 'status-scheduled' };
-        
-        // إذا كان اليوم
-        if (diffInMinutes > 60) return { label: 'منتهي', class: 'status-finished' };
-        if (diffInMinutes >= 0 && diffInMinutes <= 60) return { label: 'جارٍ الآن', class: 'status-ongoing' };
-        return { label: 'مجدول', class: 'status-scheduled' };
-    }
-
-    function loadAppointments() {
-        const list = document.getElementById('appointmentsList');
-        const all = JSON.parse(localStorage.getItem('salon_appointments') || '[]');
-        const filtered = all.filter(a => a.date === selectedDate).sort((a,b) => a.time.localeCompare(b.time));
-
-        list.innerHTML = filtered.length ? '' : '<p style="text-align:center; color:#999;">لا توجد مواعيد لهذا اليوم</p>';
-
-        filtered.forEach(app => {
-            const status = getStatus(app.time, app.date);
-            list.innerHTML += `
-                <div class="appointment-card">
-                    <div>
-                        <strong>${app.time}</strong> - الخبيرة: ${app.expert}
-                    </div>
-                    <div class="status ${status.class}">${status.label}</div>
+    filtered.forEach(b => {
+        const status = getStatus(b.s, b.date);
+        list.innerHTML += `
+            <div class="a-card">
+                <div class="a-time"><strong>${fmt(b.s)}</strong></div>
+                <div class="a-details">
+                    <div style="font-weight:800">${b.work}</div>
+                    <div style="font-size:12px; color:#888">الخبيرة: ${b.n}</div>
                 </div>
-            `;
-        });
-    }
-</script>
+                <div class="status-badge ${status.class}">${status.label}</div>
+                <button class="btn-del" onclick="deleteBooking('${b.id}')" style="margin-right:10px">إلغاء</button>
+            </div>
+        `;
+    });
+}
 
+function saveBooking() {
+    if (selStart === null) return alert("اختر الوقت");
+    const newB = {
+        id: Date.now().toString(),
+        n: document.getElementById('eng').value,
+        work: document.getElementById('work').value,
+        date: selDate,
+        s: selStart,
+        e: selStart + 1
+    };
+    SYSTEM.bookings.push(newB);
+    localStorage.setItem('salon_db', JSON.stringify(SYSTEM.bookings));
+    selStart = null;
+    updateUI();
+}
+
+function deleteBooking(id) {
+    SYSTEM.bookings = SYSTEM.bookings.filter(b => b.id !== id);
+    localStorage.setItem('salon_db', JSON.stringify(SYSTEM.bookings));
+    updateUI();
+}
+
+function fmt(h) { return h > 12 ? (h-12)+':00 م' : h+':00 ص'; }
+function onEngChange() { selStart = null; updateUI(); }
+</script>
 </body>
 </html>
