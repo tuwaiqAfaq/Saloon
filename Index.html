@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SalonBooking Pro | Demo Version</title>
+    <title>SalonBooking Pro | نظام إدارة الصالونات</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* احتفظت بنفس الـ CSS الفاخر الذي أرسلته مع إضافة ألوان الحالات الجديدة */
+        /* ═══════════════════════════════════════════
+           PREMIUM SAAS TOKENS (ألوان هادئة وراقية)
+        ═══════════════════════════════════════════ */
         :root {
             --brand-gradient: linear-gradient(135deg, #c89fa3 0%, #ab7a80 100%);
             --brand-glow: 0 10px 25px -5px rgba(171, 122, 128, 0.4);
+            
             --bg-main: #fbf9f9; 
             --surface: rgba(255, 255, 255, 0.95);
             --border-light: rgba(224, 212, 214, 0.8);
+            
             --text-main: #373233; 
             --text-muted: #8b8082;
+            
             --radius-sm: 8px;
             --radius-md: 14px;
             --radius-lg: 20px;
             --radius-xl: 24px;
+            
             --shadow-float: 0 20px 40px -15px rgba(55, 50, 51, 0.05);
             --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            
             --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
             background-color: var(--bg-main);
@@ -33,202 +41,568 @@
             color: var(--text-main);
             min-height: 100vh;
             display: flex; flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Navbar & Layout - نفس تصميمك */
-        .navbar { margin: 24px auto; width: calc(100% - 48px); max-width: 1400px; height: 64px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 24px; gap: 30px; box-shadow: var(--shadow-card); position: relative; z-index: 100; }
-        .nav-logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 800; }
-        .nav-logo-icon { width: 36px; height: 36px; background: var(--brand-gradient); border-radius: 10px; display: grid; place-items: center; color: #fff; box-shadow: var(--brand-glow); }
-        
-        .page-layout { display: grid; grid-template-columns: 380px 1fr; gap: 32px; max-width: 1400px; margin: 0 auto; width: 100%; padding: 10px 24px 60px; }
-        @media (max-width: 900px) { .page-layout { grid-template-columns: 1fr; } }
+        /* ═══════════════════════════════════════════
+           LOADING SCREEN
+        ═══════════════════════════════════════════ */
+        #loader { 
+            position: fixed; inset: 0; background: var(--bg-main); z-index: 1000; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; 
+        }
+        .spinner { 
+            width: 50px; height: 50px; border: 5px solid #ebe1e3; border-top-color: #ab7a80; 
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius-xl); box-shadow: var(--shadow-float); padding: 32px; }
-        .card-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+        /* ═══════════════════════════════════════════
+           NAVBAR 
+        ═══════════════════════════════════════════ */
+        .navbar {
+            margin: 24px auto;
+            width: calc(100% - 48px);
+            max-width: 1400px;
+            height: 64px;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            display: flex; align-items: center; padding: 0 24px; gap: 30px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            z-index: 100;
+        }
+        .nav-logo { display: flex; align-items: center; gap: 12px; font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .nav-logo-icon { width: 36px; height: 36px; background: var(--brand-gradient); border-radius: 10px; display: grid; place-items: center; color: #fff; font-size: 18px; box-shadow: var(--brand-glow); }
+        .nav-links { display: flex; gap: 8px; flex: 1; }
+        .nav-link { padding: 8px 16px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition-smooth); border: none; background: none; font-family: inherit; }
+        .nav-link.active { color: #ab7a80; background: #f5eff0; }
+        .user-profile { display: flex; align-items: center; gap: 12px; padding-right: 20px; border-right: 1px solid var(--border-light); }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-gradient); display: grid; place-items: center; color: white; font-weight: bold; font-size: 13px; }
+
+        /* ═══════════════════════════════════════════
+           MAIN LAYOUT
+        ═══════════════════════════════════════════ */
+        .page-layout {
+            display: grid; grid-template-columns: 380px 1fr; gap: 32px;
+            max-width: 1400px; margin: 0 auto; width: 100%; padding: 10px 24px 60px;
+        }
+
+        /* ═══════════════════════════════════════════
+           PREMIUM CARDS
+        ═══════════════════════════════════════════ */
+        .card {
+            background: var(--surface); border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl); box-shadow: var(--shadow-float);
+            padding: 32px; backdrop-filter: blur(20px);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .card-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
         .card-title::before { content: ''; display: block; width: 6px; height: 20px; background: var(--brand-gradient); border-radius: 6px; }
 
-        /* Inputs & Buttons */
-        .field-group { margin-bottom: 20px; }
-        .field-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
-        .field-select { width: 100%; padding: 12px; border: 2px solid #ebe1e3; border-radius: var(--radius-md); font-family: inherit; font-weight: 600; outline: none; }
+        /* ═══════════════════════════════════════════
+           INPUT FIELDS
+        ═══════════════════════════════════════════ */
+        .field-group { margin-bottom: 24px; }
+        .field-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .field-select {
+            width: 100%; padding: 14px 16px; border: 2px solid #ebe1e3; border-radius: var(--radius-md); 
+            font-size: 15px; font-weight: 600; color: var(--text-main); background: #fff; outline: none; 
+            cursor: pointer; transition: var(--transition-smooth); appearance: none; font-family: inherit;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ab7a80' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: left 16px center;
+        }
+        .field-select:focus { border-color: #ab7a80; box-shadow: 0 0 0 4px rgba(171, 122, 128, 0.15); }
 
-        /* Time Grid & Slots */
-        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .t-slot { padding: 10px 0; border-radius: var(--radius-sm); border: 1.5px solid var(--border-light); text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
-        .t-slot.selected { background: var(--brand-gradient); color: #fff; border-color: transparent; }
-        .t-slot.booked { opacity: 0.4; cursor: not-allowed; background: #eee; }
-
-        /* Agenda Cards */
-        .a-card { display: flex; align-items: center; padding: 20px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); margin-bottom: 12px; }
-        .a-time { width: 120px; border-left: 2px solid #f9f8f8; }
-        .a-details { flex: 1; padding: 0 15px; }
+        /* ═══════════════════════════════════════════
+           DATE GRID
+        ═══════════════════════════════════════════ */
+        .date-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px; }
+        .date-chip {
+            padding: 12px 4px; border-radius: var(--radius-md); background: #fff; 
+            border: 1px solid var(--border-light); text-align: center; cursor: pointer; 
+            transition: var(--transition-smooth); box-shadow: var(--shadow-card); user-select: none;
+        }
+        .date-chip.off-day { background: #f5f0f1; opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+        .date-chip:hover:not(.active):not(.off-day) { transform: translateY(-2px); border-color: #d1c1c3; }
+        .date-chip.active { background: var(--brand-gradient); border-color: transparent; box-shadow: var(--brand-glow); transform: translateY(-2px); }
         
-        /* ألوان الحالات الجديدة */
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
-        .status-scheduled { background: #e0f2fe; color: #0369a1; } /* مجدول */
-        .status-ongoing { background: #dcfce7; color: #15803d; border: 1px solid #15803d; animation: pulse 2s infinite; } /* جارٍ الآن */
-        .status-finished { background: #f3f4f6; color: #6b7280; opacity: 0.7; } /* منتهي */
+        .chip-day { font-size: 10px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px; transition: 0.2s; }
+        .chip-num { font-size: 18px; font-weight: 800; color: var(--text-main); display: block; line-height: 1; transition: 0.2s; }
+        .chip-badge { font-size: 9px; font-weight: 700; margin-top: 6px; color: #10b981; }
+        
+        .date-chip.active .chip-day, .date-chip.active .chip-badge { color: rgba(255,255,255,0.8); }
+        .date-chip.active .chip-num { color: #fff; }
 
+        /* ═══════════════════════════════════════════
+           DURATION & TIME GRID
+        ═══════════════════════════════════════════ */
+        .dur-row { display: flex; gap: 8px; margin-bottom: 20px; background: #f5eff0; padding: 6px; border-radius: var(--radius-md); }
+        .dur-btn { flex: 1; padding: 10px; text-align: center; border-radius: 10px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: var(--transition-smooth); font-family: inherit; }
+        .dur-btn.active { background: #fff; color: var(--text-main); box-shadow: var(--shadow-card); }
+
+        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        
+        .t-slot { 
+            padding: 8px 0;
+            border-radius: var(--radius-sm); background: #fff; border: 1.5px solid var(--border-light); 
+            text-align: center; font-size: 14px; font-weight: 700; color: var(--text-main); 
+            cursor: pointer; transition: var(--transition-smooth); user-select: none; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .t-slot:hover:not(.booked) { border-color: #ab7a80; transform: scale(1.03); }
+        .t-slot.preview { background: #fdfafb; border-color: #d1c1c3; color: #ab7a80; }
+        .t-slot.selected { background: var(--brand-gradient); color: #fff; border-color: transparent; box-shadow: var(--brand-glow); transform: scale(1.05); }
+        .t-slot.booked { background: #f9f8f8; color: #b3abaa; cursor: not-allowed; border-color: #ede9e9; opacity: 0.6; }
+
+        .t-slot:not(.booked):not(.selected):not(.preview)::after { content: '● متاح'; font-size: 10px; color: #10b981; margin-top: 4px; font-weight: 600; }
+        .t-slot.preview::after { content: 'يتوافق مع المدة'; font-size: 10px; color: #ab7a80; margin-top: 4px; font-weight: 600; }
+        .t-slot.selected::after { content: '✓ تم الاختيار'; font-size: 10px; color: #ffffff; margin-top: 4px; font-weight: 600; opacity: 0.9; }
+        .t-slot.booked::after { content: 'محجوز'; font-size: 10px; color: #b3abaa; margin-top: 4px; font-weight: 600; }
+
+        /* ═══════════════════════════════════════════
+           ACTION BUTTON
+        ═══════════════════════════════════════════ */
+        .btn-submit {
+            width: 100%; padding: 16px; margin-top: 32px; background: var(--brand-gradient); color: white;
+            border: none; border-radius: var(--radius-md); font-size: 16px; font-weight: 800; cursor: pointer;
+            transition: var(--transition-smooth); font-family: inherit; box-shadow: var(--brand-glow);
+        }
+        .btn-submit:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .btn-submit:disabled { background: #d1c1c3; box-shadow: none; cursor: not-allowed; transform: none; }
+
+        /* ═══════════════════════════════════════════
+           AGENDA CARDS 
+        ═══════════════════════════════════════════ */
+        .agenda-header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .stat-badge { background: #f5eff0; color: #ab7a80; padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 14px; border: 1px solid #d1c1c3; }
+        
+        .agenda-list { display: flex; flex-direction: column; gap: 16px; }
+        .a-card { display: flex; align-items: center; padding: 20px; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-light); box-shadow: var(--shadow-card); transition: var(--transition-smooth); }
+        .a-card:hover { transform: translateX(-4px); border-color: #d1c1c3; box-shadow: var(--shadow-float); }
+        
+        .a-time { width: 140px; border-left: 2px solid #f9f8f8; padding-left: 20px; }
+        .a-details { flex: 1; padding-right: 20px; }
+        .a-work { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+        .a-work-icon { width: 32px; height: 32px; background: #f5eff0; border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+        .a-eng { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        
+        /* ─── ألوان الحالات الجديدة المضافة ─── */
+        .a-status { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-left: 15px; }
+        .status-scheduled { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+        .status-ongoing { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; animation: pulse 2s infinite; }
+        .status-finished { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        /* ─────────────────────────────── */
 
-        .btn-submit { width: 100%; padding: 16px; margin-top: 20px; background: var(--brand-gradient); color: white; border: none; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; box-shadow: var(--brand-glow); }
-        .btn-del { color: #ef4444; background: none; border: 1px solid #fee2e2; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .btn-del { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 1px solid #e5e7eb; color: #ef4444; font-size: 18px; cursor: pointer; transition: 0.2s; display: grid; place-items: center; }
+        .btn-del:hover { background: #fef2f2; border-color: #fecaca; transform: rotate(90deg); }
 
-        .date-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
-        .date-chip { min-width: 60px; padding: 10px; border: 1px solid var(--border-light); border-radius: 12px; text-align: center; cursor: pointer; background: white; }
-        .date-chip.active { background: var(--brand-gradient); color: white; border: none; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; filter: grayscale(1); }
+        .empty-text { font-size: 16px; font-weight: 700; color: var(--text-muted); }
+        .fade { opacity: 0.3; pointer-events: none; filter: grayscale(0.5); transition: all 0.3s; }
+
+        /* ═══════════════════════════════════════════
+           SMART TOAST NOTIFICATIONS
+        ═══════════════════════════════════════════ */
+        .toast {
+            visibility: hidden; position: fixed; z-index: 9999; bottom: 30px; left: 50%; transform: translateX(-50%);
+            min-width: 320px; text-align: center; padding: 16px 24px; border-radius: var(--radius-md); 
+            font-size: 14px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); color: white; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show { visibility: visible; opacity: 1; bottom: 40px; }
+        .toast.success { background: #373233; border-bottom: 4px solid #10b981; }
+        .toast.error   { background: #373233; border-bottom: 4px solid #ef4444; }
+        .toast.warn    { background: #373233; border-bottom: 4px solid #f59e0b; }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1c1c3; border-radius: 10px; }
     </style>
 </head>
 <body>
 
+<div id="loader">
+    <div class="spinner"></div>
+    <div style="font-weight: 700; color: var(--text-main); font-size: 18px;">جاري إعداد النظام...</div>
+    <div style="font-weight: 500; color: var(--text-muted); font-size: 13px; margin-top: 5px;">تحميل النسخة التجريبية...</div>
+</div>
+
 <nav class="navbar">
-    <div class="nav-logo"><div class="nav-logo-icon">✨</div> SalonBooking Pro</div>
-    <div style="flex:1"></div>
-    <div id="user-name" style="font-weight: 700; font-size: 14px;">مديرة النظام</div>
+    <div class="nav-logo">
+        <div class="nav-logo-icon">✨</div>
+        SalonBooking Pro
+    </div>
+    <div class="nav-links">
+        <button class="nav-link active">لوحة المواعيد</button>
+    </div>
+    <div class="user-profile">
+        <div style="text-align: left;">
+            <div style="font-size: 14px; font-weight: 700;" id="user-name">مديرة الصالون</div>
+        </div>
+        <div class="avatar" id="user-avatar">م</div>
+    </div>
 </nav>
 
 <div class="page-layout">
     <aside>
         <div class="card">
-            <div class="card-title">حجز موعد جديد</div>
-            <div class="field-group">
-                <label class="field-label">الخدمة</label>
-                <select class="field-select" id="work" onchange="updateUI()"></select>
+            <div class="card-header">
+                <div class="card-title">حجز موعد جديد</div>
             </div>
+
             <div class="field-group">
-                <label class="field-label">الخبيرة</label>
+                <label class="field-label">الخدمة المطلوبة</label>
+                <select class="field-select" id="work" onchange="onWorkChange()"></select>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">مقدمة الخدمة (الخبيرة)</label>
                 <select class="field-select" id="eng" onchange="onEngChange()"></select>
             </div>
-            <div class="field-label">اختر التاريخ</div>
-            <div class="date-strip" id="slider"></div>
-            <div class="field-label" style="margin-top:20px">الوقت المتاح</div>
-            <div class="time-grid" id="grid"></div>
-            <button class="btn-submit" onclick="saveBooking()">تأكيد الحجز 💅</button>
+
+            <div id="sec-date" class="fade">
+                <label class="field-label" style="margin-top: 32px;">مواعيد الخبيرة المتاحة</label>
+                <div class="date-strip" id="slider"></div>
+            </div>
+
+            <div id="sec-time" class="fade" style="margin-top:24px">
+                <label class="field-label">المدة المطلوبة للخدمة</label>
+                <div class="dur-row">
+                    <button class="dur-btn active" data-v="1" onclick="selectDur(this)">ساعة</button>
+                    <button class="dur-btn" data-v="2" onclick="selectDur(this)">ساعتان</button>
+                    <button class="dur-btn" data-v="4" onclick="selectDur(this)">نصف يوم</button>
+                    <button class="dur-btn" data-v="8" onclick="selectDur(this)">يوم كامل</button>
+                </div>
+
+                <label class="field-label">تخصيص الوقت</label>
+                <div class="time-grid" id="grid"></div>
+
+                <button class="btn-submit" onclick="saveBooking()" id="btnSubmit">تأكيد الموعد 💅</button>
+            </div>
         </div>
     </aside>
 
     <main>
-        <div class="card">
-            <div class="card-title" id="agenda-title">مواعيد اليوم</div>
-            <div id="agenda-list"></div>
+        <div class="card" style="min-height: calc(100vh - 120px);">
+            <div class="card-header">
+                <div class="card-title">سجل المواعيد اليومية</div>
+            </div>
+
+            <div class="agenda-header-tools">
+                <div style="font-size: 18px; font-weight: 800; color: var(--text-main);" id="agenda-date-title">مواعيد اليوم</div>
+                <div class="stat-badge" id="stat-badge">0 مواعيد</div>
+            </div>
+
+            <div class="agenda-list" id="agenda-list">
+                </div>
+            
+            <div id="agenda-empty" class="empty-state" style="display:none">
+                <div class="empty-icon">✨</div>
+                <div class="empty-text">لا توجد مواعيد مجدولة لهذا اليوم</div>
+            </div>
         </div>
     </main>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <script>
-// الإعدادات الافتراضية للنسخة التجريبية
+// ─── SYSTEM STATE (Local Data) ───────────────
 let SYSTEM = {
-    engineers: ["سارة (شعر)", "نورة (ميك اب)", "ريم (أظافر)"],
-    equipment: ["قص واستشوار", "مكياج سهرة", "مانيكير وباديكير", "تنظيف بشرة"],
-    startHour: 10,
-    endHour: 22,
-    bookings: JSON.parse(localStorage.getItem('salon_db') || '[]')
+    engineers: ["سارة (شعر)", "نورة (ميك اب)", "ريم (أظافر)"], 
+    equipment: ["قص واستشوار", "مكياج سهرة", "مانيكير وباديكير", "تنظيف بشرة"], 
+    startHour: 10, 
+    endHour: 22,   
+    offDays: [5],  
+    bookings: []
 };
 
-let selDate = new Date().toISOString().split('T')[0];
+let HOURS = [];
+const DAYS_AR = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+
+let todayStr = new Date().toISOString().split('T')[0];
+let selDate  = todayStr;
 let selStart = null;
-const dur = 1; 
+let dur      = 1;
 
-window.onload = () => {
-    // تعبئة القوائم
-    document.getElementById('work').innerHTML = SYSTEM.equipment.map(e => `<option>${e}</option>`).join('');
-    document.getElementById('eng').innerHTML = SYSTEM.engineers.map(e => `<option>${e}</option>`).join('');
+// ─── INITIALIZATION ────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+    // جلب المواعيد المحفوظة في المتصفح
+    let saved = JSON.parse(localStorage.getItem('salon_local_db') || '[]');
+    SYSTEM.bookings = saved;
+
+    // محاكاة تأخير التحميل لظهور شاشة اللودنق الفخمة
+    setTimeout(() => {
+        initializeSystem(SYSTEM);
+    }, 800);
+});
+
+function initializeSystem(data) {
+    HOURS = Array.from({length: SYSTEM.endHour - SYSTEM.startHour}, (_, i) => SYSTEM.startHour + i);
+    
+    const workSelect = document.getElementById('work');
+    workSelect.innerHTML = `<option value="" disabled selected>— اختاري الخدمة —</option>` + 
+                           SYSTEM.equipment.map(e => `<option value="${e}">${e}</option>`).join('');
+
+    const engSelect = document.getElementById('eng');
+    engSelect.innerHTML = `<option value="" disabled selected>— اختاري الخبيرة —</option>` + 
+                          SYSTEM.engineers.map(e => `<option value="${e}">${e}</option>`).join('');
+    
     buildCalendar();
+    
+    document.getElementById('loader').style.opacity = '0';
+    setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+    
     updateUI();
-};
+}
 
 function buildCalendar() {
     const slider = document.getElementById('slider');
     slider.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(); d.setDate(d.getDate() + i);
+    const today = new Date();
+    
+    for (let i = 0; i < 14; i++) {
+        const d = new Date(today); d.setDate(today.getDate() + i);
         const dStr = d.toISOString().split('T')[0];
+        const dayIndex = d.getDay();
+        
+        const isOffDay = SYSTEM.offDays.includes(dayIndex);
+        
         const chip = document.createElement('div');
-        chip.className = `date-chip ${dStr === selDate ? 'active' : ''}`;
-        chip.innerHTML = `<strong>${d.getDate()}</strong><br><small>${d.toLocaleDateString('ar-SA', {weekday: 'short'})}</small>`;
-        chip.onclick = () => { selDate = dStr; buildCalendar(); updateUI(); };
+        chip.className = `date-chip ${isOffDay ? 'off-day' : ''}`;
+        chip.id = 'dc-'+dStr;
+        chip.innerHTML = `
+            <span class="chip-day">${i===0 ? 'اليوم' : DAYS_AR[dayIndex]}</span>
+            <span class="chip-num">${d.getDate()}</span>
+            ${!isOffDay ? `<div class="chip-badge" id="cb-${dStr}"></div>` : '<div class="chip-badge" style="color:#b3abaa">إجازة</div>'}
+        `;
+        
+        if (!isOffDay) {
+            chip.onclick = () => { selDate = dStr; updateUI(); };
+        }
         slider.appendChild(chip);
     }
 }
 
-function updateUI() {
+// ─── UI INTERACTIONS ─────────────────────────────────────────
+function onWorkChange() { selStart = null; updateUI(); }
+
+function onEngChange() {
+    const eng = document.getElementById('eng').value;
+    document.getElementById('user-name').textContent = eng || 'مديرة الصالون';
+    document.getElementById('user-avatar').textContent = eng ? eng.charAt(0) : 'م';
+    selStart = null;
+    updateUI();
+}
+
+function selectDur(btn) {
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    dur = parseInt(btn.dataset.v);
+    selStart = null; 
     renderTime();
-    renderAgenda();
+}
+
+function updateUI() {
+    const eng = document.getElementById('eng').value;
+    const work = document.getElementById('work').value;
+    
+    document.getElementById('sec-date').classList.toggle('fade', !eng);
+    document.getElementById('sec-time').classList.toggle('fade', !(eng && selDate));
+
+    document.querySelectorAll('.date-chip').forEach(e => e.classList.remove('active'));
+    if(document.getElementById('dc-'+selDate)) {
+        document.getElementById('dc-'+selDate).classList.add('active');
+    }
+
+    document.getElementById('agenda-date-title').textContent = selDate === todayStr ? 'مواعيد اليوم الجارية' : `مواعيد يوم ${selDate}`;
+
+    renderTime(); renderAgenda(); updateBadges();
 }
 
 function renderTime() {
     const grid = document.getElementById('grid');
     const eng = document.getElementById('eng').value;
     grid.innerHTML = '';
-    for (let h = SYSTEM.startHour; h < SYSTEM.endHour; h++) {
-        const isBooked = SYSTEM.bookings.some(b => b.date === selDate && b.n === eng && b.s === h);
+    
+    HOURS.forEach(h => {
+        const over = (h + dur) > SYSTEM.endHour;
+        const conflict = SYSTEM.bookings.some(b => b.date===selDate && b.n===eng && (h < b.e && (h+dur) > b.s));
+        const booked = over || conflict;
+        
         const slot = document.createElement('div');
-        slot.className = `t-slot ${isBooked ? 'booked' : ''} ${selStart === h ? 'selected' : ''}`;
+        slot.className = `t-slot ${booked?'booked':''} ${selStart===h?'selected':''}`;
         slot.textContent = fmt(h);
-        if (!isBooked) slot.onclick = () => { selStart = h; renderTime(); };
+        
+        if (!booked) {
+            slot.onmouseenter = () => hoverPreview(h);
+            slot.onmouseleave = () => clearPreview();
+            slot.onclick = () => { selStart = h; renderTime(); };
+        }
         grid.appendChild(slot);
-    }
+    });
 }
 
-function getStatus(startH, dateStr) {
+function hoverPreview(startH) {
+    if (selStart !== null) return;
+    document.querySelectorAll('.t-slot').forEach((s,i) => {
+        const h = HOURS[i];
+        if (!s.classList.contains('booked') && h >= startH && h < startH + dur) s.classList.add('preview');
+    });
+}
+function clearPreview() {
+    if (selStart !== null) return;
+    document.querySelectorAll('.t-slot.preview').forEach(s => s.classList.remove('preview'));
+}
+
+// ─── ميزة حساب الحالة (مجدول، منتهي، جاري) ───────────────────
+function getBookingStatus(startH, endH, bDate) {
     const now = new Date();
     const currentHour = now.getHours();
     const today = now.toISOString().split('T')[0];
 
-    if (dateStr < today) return { label: "منتهي", class: "status-finished" };
-    if (dateStr > today) return { label: "مجدول", class: "status-scheduled" };
+    if (bDate < today) return { label: "● منتهي", class: "status-finished" };
+    if (bDate > today) return { label: "● مجدول", class: "status-scheduled" };
     
-    // إذا كان اليوم
-    if (currentHour > startH) return { label: "منتهي", class: "status-finished" };
-    if (currentHour === startH) return { label: "جارٍ الآن", class: "status-ongoing" };
-    return { label: "مجدول", class: "status-scheduled" };
+    // إذا كان الموعد اليوم
+    if (currentHour >= endH) return { label: "● منتهي", class: "status-finished" };
+    if (currentHour >= startH && currentHour < endH) return { label: "● جارٍ الآن", class: "status-ongoing" };
+    
+    return { label: "● مجدول", class: "status-scheduled" };
 }
 
+// ─── AGENDA RENDERING ────────────────────────────────────────
 function renderAgenda() {
     const list = document.getElementById('agenda-list');
-    const filtered = SYSTEM.bookings.filter(b => b.date === selDate).sort((a,b) => a.s - b.s);
-    list.innerHTML = filtered.length ? '' : '<p style="text-align:center; color:#999; padding:20px;">لا توجد مواعيد</p>';
+    const empty = document.getElementById('agenda-empty');
+    const badge = document.getElementById('stat-badge');
+    
+    let db = SYSTEM.bookings.filter(b => b.date === selDate).sort((a,b) => a.s - b.s);
+    
+    badge.textContent = `${db.length} مواعيد مجدولة`;
 
-    filtered.forEach(b => {
-        const status = getStatus(b.s, b.date);
-        list.innerHTML += `
-            <div class="a-card">
-                <div class="a-time"><strong>${fmt(b.s)}</strong></div>
-                <div class="a-details">
-                    <div style="font-weight:800">${b.work}</div>
-                    <div style="font-size:12px; color:#888">الخبيرة: ${b.n}</div>
+    if (db.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+    
+    empty.style.display = 'none';
+    list.innerHTML = '';
+
+    db.forEach(b => {
+        const status = getBookingStatus(b.s, b.e, b.date); // استدعاء دالة الحالة
+        
+        const card = document.createElement('div');
+        card.className = 'a-card';
+        card.innerHTML = `
+            <div class="a-time">
+                <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; background: #f9f8f8; border: 1px solid #ede9e9; padding: 4px 8px; border-radius: 6px; text-align: center;">
+                    🟢 ${fmt(b.s)}
                 </div>
-                <div class="status-badge ${status.class}">${status.label}</div>
-                <button class="btn-del" onclick="deleteBooking('${b.id}')" style="margin-right:10px">إلغاء</button>
+                <div style="font-size: 15px; font-weight: 800; color: var(--text-main); background: #f9f8f8; border: 1px solid #ede9e9; padding: 4px 8px; border-radius: 6px; text-align: center;">
+                    🔴 ${fmt(b.e)}
+                </div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: center; margin-top: 8px;">
+                    ⏱ المدة: ${b.e - b.s} ساعات
+                </div>
+            </div>
+            <div class="a-details">
+                <div class="a-work">
+                    <div class="a-work-icon">✨</div>
+                    ${b.work}
+                </div>
+                <div class="a-eng">الخبيرة: ${b.n}</div>
+            </div>
+            <div class="a-status ${status.class}">${status.label}</div>
+            <div class="a-actions">
+                <button class="btn-del" onclick="delBooking('${b.id}')" title="إلغاء الموعد">×</button>
             </div>
         `;
+        list.appendChild(card);
     });
 }
 
+function updateBadges() {
+    const eng = document.getElementById('eng').value;
+    document.querySelectorAll('.date-chip:not(.off-day)').forEach(chip => {
+        const d = chip.id.replace('dc-','');
+        const bndg = document.getElementById('cb-'+d);
+        if (!eng) { bndg.textContent = ''; return; }
+        
+        const taken = SYSTEM.bookings.filter(b => b.date===d && b.n===eng).reduce((a,b)=>a+(b.e-b.s),0);
+        const rem = Math.max(0, HOURS.length - taken);
+        
+        bndg.textContent = rem + ' س';
+        bndg.style.color = chip.classList.contains('active') ? '#fff' : (rem===0 ? '#ef4444' : '#10b981');
+    });
+}
+
+// ─── BACKEND SAVE/DELETE CALLS (تم تحويلها لتعمل محلياً) ───────
 function saveBooking() {
-    if (selStart === null) return alert("اختر الوقت");
-    const newB = {
-        id: Date.now().toString(),
-        n: document.getElementById('eng').value,
-        work: document.getElementById('work').value,
-        date: selDate,
-        s: selStart,
-        e: selStart + 1
-    };
-    SYSTEM.bookings.push(newB);
-    localStorage.setItem('salon_db', JSON.stringify(SYSTEM.bookings));
-    selStart = null;
-    updateUI();
+    const work = document.getElementById('work').value;
+    const eng = document.getElementById('eng').value;
+
+    if (!work) return showToast('يرجى اختيار الخدمة المطلوبة أولاً', 'warn');
+    if (!eng) return showToast('يرجى اختيار الخبيرة أولاً', 'warn');
+    if (selStart == null) return showToast('يرجى تحديد وقت البدء من الجدول', 'warn');
+    
+    const endT = selStart + dur;
+    
+    if (SYSTEM.bookings.some(b => b.date===selDate && b.n===eng && (selStart < b.e && endT > b.s))) {
+        return showToast('الخبيرة مشغولة في هذا الوقت، الرجاء اختيار وقت آخر', 'error');
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'جاري تسجيل الموعد...';
+
+    const newBooking = { id: Date.now().toString(), n: eng, work: work, date: selDate, s: selStart, e: endT };
+    
+    // محاكاة الاتصال للحفاظ على نفس تجربة المستخدم
+    setTimeout(() => {
+        SYSTEM.bookings.push(newBooking);
+        localStorage.setItem('salon_local_db', JSON.stringify(SYSTEM.bookings)); // حفظ في المتصفح
+        showToast('💅 تم تأكيد الموعد بنجاح', 'success');
+        selStart = null; 
+        btn.disabled = false; btn.textContent = 'تأكيد الموعد 💅';
+        updateUI();
+    }, 600);
 }
 
-function deleteBooking(id) {
-    SYSTEM.bookings = SYSTEM.bookings.filter(b => b.id !== id);
-    localStorage.setItem('salon_db', JSON.stringify(SYSTEM.bookings));
-    updateUI();
+function delBooking(id) {
+    if (!confirm('هل أنتِ متأكدة من إلغاء هذا الموعد؟')) return;
+    
+    showToast('جاري الحذف...', 'warn');
+    
+    setTimeout(() => {
+        SYSTEM.bookings = SYSTEM.bookings.filter(b => b.id !== id);
+        localStorage.setItem('salon_local_db', JSON.stringify(SYSTEM.bookings)); // تحديث الحفظ
+        showToast('تم إلغاء الموعد بنجاح', 'success');
+        updateUI();
+    }, 500);
 }
 
-function fmt(h) { return h > 12 ? (h-12)+':00 م' : h+':00 ص'; }
-function onEngChange() { selStart = null; updateUI(); }
+// ─── UTILITIES ────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast show ${type}`;
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.className = 'toast'; }, 3500);
+}
+
+function fmt(h) {
+    if (h===12) return '12:00 م';
+    return h > 12 ? (h-12)+':00 م' : h+':00 ص';
+}
+
 </script>
 </body>
 </html>
