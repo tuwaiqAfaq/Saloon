@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalonBooking Pro V15 - Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d4af37;
+            --dark: #1a1a1a;
+            --bg: #f8f9fa;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; color: var(--dark); border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+
+        /* شبكة التواريخ */
+        .date-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .date-item {
+            padding: 10px;
+            text-align: center;
+            background: #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .date-item.active { background: var(--primary); color: white; }
+
+        /* الأجندة والمواعيد */
+        .agenda { margin-top: 30px; }
+        .appointment-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-right: 5px solid var(--primary);
+            background: #fff;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .status { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .status-scheduled { background: #e3f2fd; color: #0d47a1; } /* مجدول */
+        .status-ongoing { background: #e8f5e9; color: #1b5e20; border: 1px solid #1b5e20; } /* جارٍ */
+        .status-finished { background: #fafafa; color: #757575; text-decoration: line-through; } /* منتهي */
+
+        /* فورم الحجز */
+        .booking-form {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button { background: var(--dark); color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: var(--primary); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        .time-lock { color: var(--danger); text-align: center; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>صالون ومدة - SalonBooking Pro V15</h2>
+    
+    <div id="lockMessage" class="time-lock">عذراً، انتهى وقت العمل اليوم (8:00 مساءً). يرجى الحجز ليوم آخر.</div>
+
+    <div class="booking-form" id="bookingForm">
+        <label>اختر الخبيرة:</label>
+        <select id="expertSelect">
+            <option value="سارة">سارة (شعر)</option>
+            <option value="نورة">نورة (ميك اب)</option>
+            <option value="ريم">ريم (أظافر)</option>
+        </select>
+        
+        <label>الوقت:</label>
+        <input type="time" id="appointmentTime" required>
+        
+        <button onclick="saveAppointment()" id="btnSave">حجز موعد جديد</button>
+    </div>
+
+    <div class="date-grid" id="dateGrid"></div>
+
+    <div class="agenda">
+        <h3>جدول المواعيد ليوم <span id="selectedDateText"></span></h3>
+        <div id="appointmentsList"></div>
+    </div>
+</div>
+
+<script>
+    let selectedDate = new Date().toISOString().split('T')[0];
+    const workingHoursEnd = 20; // 8:00 PM
+
+    // تشغيل النظام
+    window.onload = () => {
+        renderDates();
+        loadAppointments();
+        checkTimeLock();
+    };
+
+    function checkTimeLock() {
+        const now = new Date();
+        const isToday = selectedDate === now.toISOString().split('T')[0];
+        if (isToday && now.getHours() >= workingHoursEnd) {
+            document.getElementById('lockMessage').style.display = 'block';
+            document.getElementById('btnSave').disabled = true;
+        } else {
+            document.getElementById('lockMessage').style.display = 'none';
+            document.getElementById('btnSave').disabled = false;
+        }
+    }
+
+    function renderDates() {
+        const grid = document.getElementById('dateGrid');
+        grid.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            
+            const div = document.createElement('div');
+            div.className = `date-item ${dateStr === selectedDate ? 'active' : ''}`;
+            div.innerHTML = `<strong>${d.getDate()}</strong><br>${d.toLocaleDateString('ar-SA', {weekday: 'short'})}`;
+            div.onclick = () => {
+                selectedDate = dateStr;
+                renderDates();
+                loadAppointments();
+                checkTimeLock();
+            };
+            grid.appendChild(div);
+        }
+        document.getElementById('selectedDateText').innerText = selectedDate;
+    }
+
+    function saveAppointment() {
+        const expert = document.getElementById('expertSelect').value;
+        const time = document.getElementById('appointmentTime').value;
+
+        if (!time) return alert("يرجى اختيار الوقت");
+
+        const appointments = JSON.parse(localStorage.getItem('salon_appointments') || '[]');
+        appointments.push({ date: selectedDate, expert, time, id: Date.now() });
+        localStorage.setItem('salon_appointments', JSON.stringify(appointments));
+        
+        loadAppointments();
+    }
+
+    function getStatus(appTime, appDate) {
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        
+        // تحويل وقت الموعد لتاريخ كامل للمقارنة
+        const [hours, minutes] = appTime.split(':');
+        const appointmentFullDate = new Date(appDate);
+        appointmentFullDate.setHours(hours, minutes, 0);
+
+        const diffInMinutes = (now - appointmentFullDate) / (1000 * 60);
+
+        if (appDate < todayStr) return { label: 'منتهي', class: 'status-finished' };
+        if (appDate > todayStr) return { label: 'مجدول', class: 'status-scheduled' };
+        
+        // إذا كان اليوم
+        if (diffInMinutes > 60) return { label: 'منتهي', class: 'status-finished' };
+        if (diffInMinutes >= 0 && diffInMinutes <= 60) return { label: 'جارٍ الآن', class: 'status-ongoing' };
+        return { label: 'مجدول', class: 'status-scheduled' };
+    }
+
+    function loadAppointments() {
+        const list = document.getElementById('appointmentsList');
+        const all = JSON.parse(localStorage.getItem('salon_appointments') || '[]');
+        const filtered = all.filter(a => a.date === selectedDate).sort((a,b) => a.time.localeCompare(b.time));
+
+        list.innerHTML = filtered.length ? '' : '<p style="text-align:center; color:#999;">لا توجد مواعيد لهذا اليوم</p>';
+
+        filtered.forEach(app => {
+            const status = getStatus(app.time, app.date);
+            list.innerHTML += `
+                <div class="appointment-card">
+                    <div>
+                        <strong>${app.time}</strong> - الخبيرة: ${app.expert}
+                    </div>
+                    <div class="status ${status.class}">${status.label}</div>
+                </div>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>
